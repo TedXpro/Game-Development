@@ -26,6 +26,9 @@ vector<vector<char>> board = {
 char currentMarker; 
 int currentPlayer;
 
+int MinMax(int depth, bool isMax, char aiMarker, char playerMarker);
+bool IsMovesLeft();
+int EvaluateBoard(char aiMarker, char playerMarker);
 bool CheckLine(int r1, int c1, int r2, int c2, int r3, int c3, char marker);
 bool FindBestMove(char markerToLookFor);
 void ComputerMove();
@@ -107,6 +110,75 @@ int main() {
     return 0;
 }
 
+int MinMax(int depth, bool isMax, char aiMarker, char playerMarker) {
+    int score = EvaluateBoard(aiMarker, playerMarker);
+    if (score != 0) return score;
+    if(!IsMovesLeft())
+        return 0;
+
+    if (isMax) {
+        int best = -1000;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] != 'X' && board[i][j] != 'O') {
+                    char temp = board[i][j];
+                    board[i][j] = aiMarker;
+                    best = max(best, MinMax(depth + 1, false, aiMarker, playerMarker));
+                    board[i][j] = temp;
+                }
+            }
+        }
+
+        return best;
+    } else {
+        int best = 1000;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] != 'X' && board[i][j] != 'O') {
+                    char temp = board[i][j];
+                    board[i][j] = playerMarker;
+                    best = min(best, MinMax(depth + 1, true, aiMarker, playerMarker));
+                    board[i][j] = temp;
+                }
+            }
+        }
+        return best;
+    }
+}
+
+bool IsMovesLeft() {
+    for (vector<char> row : board) {
+        for (char cell : row) {
+            if (cell != 'X' && cell != 'O')
+                return true;
+        }
+    }
+    return false;
+}
+
+int EvaluateBoard(char aiMarker, char playerMarker) {
+    for (int i = 0; i < 3; i++) {
+        if (board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
+            if (board[i][0] == aiMarker) return 10;
+            if (board[i][0] == playerMarker) return -10;
+        } 
+        if (board[0][i] == board[1][i] && board[1][i] == board[2][i]) {
+            if (board[0][i] == aiMarker) return 10;
+            if (board[0][i] == playerMarker) return -10;
+        }
+    }
+    
+    if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
+        if (board[1][1] == aiMarker) return 10;
+        if (board[1][1] == playerMarker) return -10;
+    }
+    if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
+        if (board[1][1] == aiMarker) return 10;
+        if (board[1][1] == playerMarker) return -10;
+    }
+    return 0;
+}
+
 bool FindBestMove(char markerToLookFor) {
     for (int i = 0; i < 3; i++) 
         if (CheckLine(i, 0, i, 1, i, 2, markerToLookFor)) return true;
@@ -146,18 +218,28 @@ bool CheckLine(int r1, int c1, int r2, int c2, int r3, int c3, char marker) {
 void ComputerMove() {
     Sleep(1000);
 
-    if (FindBestMove(currentMarker)) return;
-
+    int bestVal = -1000;
+    int bestRow = -1;
+    int bestCol = -1;
     char opponentMarker = (currentMarker == 'X') ? 'O' : 'X';
-    if (FindBestMove(opponentMarker)) return;
-    int slot;
-    int row, col;
-    do {
-        slot = (rand() % 9) + 1;
-        row = (slot - 1) / 3;
-        col = (slot - 1) % 3;
-    } while (board[row][col] == 'X' || board[row][col] == 'O');
-    board[row][col] = currentMarker;
+    char temp;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (board[i][j] != 'X' && board[i][j] != 'O') {
+                temp = board[i][j];
+                board[i][j] = currentMarker;
+                int moveVal = MinMax(0, false, currentMarker, opponentMarker);
+                board[i][j] = temp;
+                if (moveVal > bestVal) {
+                    bestVal = moveVal;
+                    bestRow = i;
+                    bestCol = j;
+                }
+            }
+        }
+    }
+
+    board[bestRow][bestCol] = currentMarker;
 }
 
 string GetColoredMarker(char marker) {
