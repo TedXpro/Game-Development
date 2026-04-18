@@ -15,7 +15,7 @@ if %errorlevel% neq 0 (
 )
 
 :: Build Tic-Tac-Toe Classic
-echo [1/2] Building Tic-Tac-Toe Classic...
+echo [1/3] Building Tic-Tac-Toe Classic...
 cd TicTacToe
 g++ -static-libgcc -static-libstdc++ main.cpp -o tictactoe.exe
 if %errorlevel% equ 0 (
@@ -28,13 +28,26 @@ cd ..
 echo.
 
 :: Build Tic-Tac-Toe Pro
-echo [2/2] Building Tic-Tac-Toe Pro (AI Edition)...
+echo [2/3] Building Tic-Tac-Toe Pro (AI Edition)...
 cd SmartTicTacToe
 g++ -static-libgcc -static-libstdc++ main.cpp -o smart_tictactoe.exe
 if %errorlevel% equ 0 (
     echo [SUCCESS] smart_tictactoe.exe created.
 ) else (
     echo [FAILED] Failed to build Tic-Tac-Toe Pro.
+)
+cd ..
+
+echo.
+
+:: Build Snake Pro
+echo [3/3] Building Snake Pro...
+cd SnakeGame
+g++ -static-libgcc -static-libstdc++ main.cpp -o snake_game.exe
+if %errorlevel% equ 0 (
+    echo [SUCCESS] snake_game.exe created.
+) else (
+    echo [FAILED] Failed to build Snake Pro.
 )
 cd ..
 

@@ -25,10 +25,15 @@ A standard 2-player version of the classic game. Perfect for playing with a frie
 An advanced version featuring:
 - **Unbeatable MinMax AI**: The computer evaluates every possible game state and plays optimally.
 - **Best of 3 / Best of 5 Series**: Live score tracking with round caps and alternating starters.
+- **Early Draw Detection**: Automatically ends rounds when no winning moves remain.
 - **Colorized UI**: Vibrant ANSI terminal colors with a live scoreboard.
 
-
----
+### 3. [Snake Pro](./SnakeGame/README.md)
+A high-performance terminal Snake game featuring:
+- **Flicker-Free Engine**: Zero screen tearing via surgical per-cell rendering.
+- **3 Playable Maps**: Classic, Portal Run (wall teleporters), and Wide Arena.
+- **Adaptive Speed**: Starts slow, escalates to blazing fast as your score climbs.
+- **Replay System**: Session high score tracking with instant replays.
 
 ---
 

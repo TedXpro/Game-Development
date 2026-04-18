@@ -8,6 +8,7 @@ A sophisticated version of Tic-Tac-Toe featuring an unbeatable MinMax AI opponen
 - **Random & Alternating Starters**: Round 1 is randomly assigned; after that, starters alternate fairly.
 - **Round Cap**: The series ends after the chosen number of rounds. If no one clinches, the player with the most wins takes it — or it's declared a draw.
 - **Vibrant UI**: ANSI color-coded markers (Red for X, Blue for O) with a live scoreboard.
+- **Early Draw Detection**: Automatically ends rounds when no winning lines remain, skipping meaningless final moves.
 - **Thinking Engine**: A 1-second delay simulates the computer "calculating" its move.
 - **Robust Input Validation**: Handles non-numeric inputs, out-of-range slots, and occupied cells gracefully.
 

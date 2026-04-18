@@ -15,7 +15,8 @@ const string RED    = "\033[31m";
 const string BLUE   = "\033[34m";
 const string GREEN  = "\033[32m";
 const string YELLOW = "\033[33m";
-const string CYAN   = "\033[36m"; 
+const string CYAN   = "\033[36m";
+const string DIM    = "\033[2m";
 
 vector<vector<char>> board = {
     {'1', '2', '3'},
@@ -41,6 +42,7 @@ void ComputerMove();
 void DrawBoard();
 void ResetBoard();
 bool CheckWin();
+bool IsDrawInevitable();
 string GetColoredMarker(char marker);
 
 /**
@@ -158,8 +160,10 @@ int main() {
                     cout << RED << "      >> COMPUTER WON ROUND " << roundNumber << "! <<" << RESET << endl;
                 }
                 roundOver = true;
-            } else if (i == 8) {
+            } else if (IsDrawInevitable()) {
                 cout << YELLOW << "      >> ROUND " << roundNumber << " IS A TIE! <<" << RESET << endl;
+                cout << DIM << "      No winning moves remaining." << RESET << endl;
+                roundOver = true;
             }
 
             if (!roundOver) {
@@ -414,6 +418,40 @@ bool CheckWin() {
     if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) return true;
     if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) return true;
     return false;
+}
+
+/**
+ * @brief Detects if a draw is inevitable regardless of remaining moves.
+ * 
+ * Tests every empty cell by temporarily placing both 'X' and 'O'.
+ * If no placement can produce three-in-a-row for either marker,
+ * the game is a guaranteed draw and can end early.
+ * 
+ * @return true  If no remaining move can win for either player.
+ * @return false If at least one winning move still exists.
+ */
+bool IsDrawInevitable() {
+    int lines[8][3][2] = {
+        {{0,0}, {0,1}, {0,2}},
+        {{1,0}, {1,1}, {1,2}},
+        {{2,0}, {2,1}, {2,2}},
+        {{0,0}, {1,0}, {2,0}},
+        {{0,1}, {1,1}, {2,1}},
+        {{0,2}, {1,2}, {2,2}},
+        {{0,0}, {1,1}, {2,2}},
+        {{0,2}, {1,1}, {2,0}}
+    };
+
+    for (int l = 0; l < 8; l++) {
+        bool hasX = false, hasO = false;
+        for (int i = 0; i < 3; i++) {
+            char cell = board[lines[l][i][0]][lines[l][i][1]];
+            if (cell == 'X') hasX = true;
+            if (cell == 'O') hasO = true;
+        }
+        if (!(hasX && hasO)) return false;
+    }
+    return true;
 }
 
 /**
