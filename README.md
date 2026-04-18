@@ -30,14 +30,24 @@ An advanced version featuring:
 
 ---
 
-## 🛠️ How to Build All Games
-Each game has a `main.cpp`. To compile any game manually:
+---
+
+## 🛠️ How to Build
+
+### Option 1: Build Everything (Recommended)
+You can compile all games at once using the provided batch script:
+1. Double-click `build_all.bat` in the root directory.
+2. The script will automatically find every game and generate the executables.
+
+### Option 2: Manual Build
+Each game has a `main.cpp`. To compile a specific game manually:
 ```powershell
-# Example for Tic-Tac-Toe
-cd TicTacToe
-g++ -static-libgcc -static-libstdc++ main.cpp -o tictactoe.exe
-./tictactoe.exe
+# Example for Tic-Tac-Toe Pro
+cd SmartTicTacToe
+g++ -static-libgcc -static-libstdc++ main.cpp -o smart_tictactoe.exe
+./smart_tictactoe.exe
 ```
 
 ## 📜 License
-This project is for educational purposes. Feel free to use and modify!
+This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and share!
+
