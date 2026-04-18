@@ -1,7 +1,5 @@
 # 🕹️ C++ Terminal Games Collection
 
-![C++ Game Studio Banner](file:///C:/Users/Tedy/.gemini/antigravity/brain/632db42e-ab23-42ba-b556-81f563d1c8d7/game_studio_banner_1776522576042.png)
-
 Welcome to my collection of classic terminal games built with C++. This project is a "Game Studio" style monorepo containing various board games and AI experiments.
 
 ## 🚀 Getting Started
@@ -20,14 +18,15 @@ To build and play these games, you need:
 
 ## 🎮 The Games
 
-### 1. [Tic-Tac-Toe Classic](file:///d:/Designs/GameDevelopment/TicTacToe/README.md)
+### 1. [Tic-Tac-Toe Classic](./TicTacToe/README.md)
 A standard 2-player version of the classic game. Perfect for playing with a friend on the same terminal.
 
-### 2. [Tic-Tac-Toe Pro (AI Edition)](file:///d:/Designs/GameDevelopment/SmartTicTacToe/README.md)
+### 2. [Tic-Tac-Toe Pro (AI Edition)](./SmartTicTacToe/README.md)
 An advanced version featuring:
-- **Computer Opponent**: A strategic AI that plays against you.
-- **Colorized UI**: Vibrant ANSI terminal colors for a premium feel.
-- **Windows Optimized**: Includes subtle delays for a "thinking" AI experience.
+- **Unbeatable MinMax AI**: The computer evaluates every possible game state and plays optimally.
+- **Best of 3 / Best of 5 Series**: Live score tracking with round caps and alternating starters.
+- **Colorized UI**: Vibrant ANSI terminal colors with a live scoreboard.
+
 
 ---
 

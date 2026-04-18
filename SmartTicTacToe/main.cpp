@@ -37,14 +37,21 @@ char computerChoice;
 int MinMax(int depth, bool isMax, char aiMarker, char playerMarker);
 bool IsMovesLeft();
 int EvaluateBoard(char aiMarker, char playerMarker);
-bool CheckLine(int r1, int c1, int r2, int c2, int r3, int c3, char marker);
-bool FindBestMove(char markerToLookFor);
 void ComputerMove();
 void DrawBoard();
 void ResetBoard();
 bool CheckWin();
 string GetColoredMarker(char marker);
 
+/**
+ * @brief Entry point for Tic-Tac-Toe Pro (AI Edition).
+ * 
+ * Handles the full game lifecycle: marker selection, series format
+ * selection (Best of 3 or 5), and the series loop with alternating
+ * starters and round-capped scoring.
+ * 
+ * @return int Exit code (0 on success).
+ */
 int main() {
     srand(time(0));
     system("cls");
@@ -90,7 +97,7 @@ int main() {
 
     bool humanStartsNext = (rand() % 2 == 0);
 
-    while (playerScore < targetWins && computerScore < targetWins) {
+    while (playerScore < targetWins && computerScore < targetWins && roundNumber < bestOf) {
         roundNumber++;
         ResetBoard();
 
@@ -169,7 +176,10 @@ int main() {
 
         humanStartsNext = !humanStartsNext;
 
-        if (playerScore < targetWins && computerScore < targetWins) {
+        bool seriesClinched = (playerScore >= targetWins || computerScore >= targetWins);
+        bool allRoundsPlayed = (roundNumber >= bestOf);
+
+        if (!seriesClinched && !allRoundsPlayed) {
             cout << endl << "  Press any key to continue to Round " << (roundNumber + 1) << "...";
             system("pause > nul");
         }
@@ -181,10 +191,25 @@ int main() {
         cout << "      ============================" << endl;
         cout << "        YOU WON THE SERIES!" << endl;
         cout << "      ============================" << RESET << endl;
-    } else {
+    } else if (computerScore >= targetWins) {
         cout << RED;
         cout << "      ============================" << endl;
         cout << "        COMPUTER WINS THE SERIES!" << endl;
+        cout << "      ============================" << RESET << endl;
+    } else if (playerScore > computerScore) {
+        cout << GREEN;
+        cout << "      ============================" << endl;
+        cout << "        YOU WIN ON POINTS!" << endl;
+        cout << "      ============================" << RESET << endl;
+    } else if (computerScore > playerScore) {
+        cout << RED;
+        cout << "      ============================" << endl;
+        cout << "        COMPUTER WINS ON POINTS!" << endl;
+        cout << "      ============================" << RESET << endl;
+    } else {
+        cout << YELLOW;
+        cout << "      ============================" << endl;
+        cout << "        SERIES ENDS IN A DRAW!" << endl;
         cout << "      ============================" << RESET << endl;
     }
     cout << endl;
@@ -195,6 +220,12 @@ int main() {
     return 0;
 }
 
+/**
+ * @brief Resets the board to its initial numbered state ('1' through '9').
+ * 
+ * Called at the start of each new round in a series to clear all
+ * previously placed markers.
+ */
 void ResetBoard() {
     int num = 1;
     for (int i = 0; i < 3; i++) {
@@ -205,6 +236,19 @@ void ResetBoard() {
     }
 }
 
+/**
+ * @brief Implements the MinMax algorithm for optimal AI decision-making.
+ * 
+ * Recursively evaluates all possible game states to determine the
+ * best possible outcome for the AI. Uses alternating maximizing and
+ * minimizing layers to simulate both players playing optimally.
+ * 
+ * @param depth    Current recursion depth (0 at the root call).
+ * @param isMax    True if the current layer is maximizing (AI's turn).
+ * @param aiMarker The marker character used by the AI ('X' or 'O').
+ * @param playerMarker The marker character used by the human player.
+ * @return int Score: +10 for AI win, -10 for player win, 0 for draw.
+ */
 int MinMax(int depth, bool isMax, char aiMarker, char playerMarker) {
     int score = EvaluateBoard(aiMarker, playerMarker);
     if (score != 0) return score;
@@ -241,6 +285,15 @@ int MinMax(int depth, bool isMax, char aiMarker, char playerMarker) {
     }
 }
 
+/**
+ * @brief Checks whether any empty slots remain on the board.
+ * 
+ * A cell is considered empty if it does not contain 'X' or 'O'
+ * (i.e., it still holds its original number character).
+ * 
+ * @return true  If at least one playable slot remains.
+ * @return false If the board is completely filled.
+ */
 bool IsMovesLeft() {
     for (vector<char> row : board) {
         for (char cell : row) {
@@ -251,6 +304,16 @@ bool IsMovesLeft() {
     return false;
 }
 
+/**
+ * @brief Evaluates the current board state and returns a heuristic score.
+ * 
+ * Scans all rows, columns, and diagonals for three-in-a-row patterns.
+ * Used exclusively by the MinMax algorithm to score terminal game states.
+ * 
+ * @param aiMarker     The AI's marker character.
+ * @param playerMarker The human player's marker character.
+ * @return int +10 if AI wins, -10 if player wins, 0 if no winner yet.
+ */
 int EvaluateBoard(char aiMarker, char playerMarker) {
     for (int i = 0; i < 3; i++) {
         if (board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
@@ -274,77 +337,75 @@ int EvaluateBoard(char aiMarker, char playerMarker) {
     return 0;
 }
 
-bool FindBestMove(char markerToLookFor) {
-    for (int i = 0; i < 3; i++) 
-        if (CheckLine(i, 0, i, 1, i, 2, markerToLookFor)) return true;
-
-    for (int i = 0; i < 3; i++) 
-        if (CheckLine(0, i, 1, i, 2, i, markerToLookFor)) return true;
-
-    if (CheckLine(0, 0, 1, 1, 2, 2, markerToLookFor)) return true;
-    if (CheckLine(0, 2, 1, 1, 2, 0, markerToLookFor)) return true;
-
-    return false;
-}
-
-bool CheckLine(int r1, int c1, int r2, int c2, int r3, int c3, char marker) {
-    int count = 0;
-    int emptyRow = -1, emptyColumn = -1;
-
-    int rows[] = {r1, r2, r3};
-    int cols[] = {c1, c2, c3};
-
-    for (int i = 0; i < 3; i++) {
-        char cell = board[rows[i]][cols[i]];
-        if (cell == marker) count++;
-        else if (cell != 'X' && cell != 'O') {
-            emptyRow = rows[i];
-            emptyColumn = cols[i];
-        }
-    }
-
-    if (count == 2 && emptyRow != -1) {
-        board[emptyRow][emptyColumn] = currentMarker;
-        return true;
-    }
-    return false;
-}
-
+/**
+ * @brief Executes the computer's turn using the MinMax algorithm.
+ * 
+ * Evaluates every available move via MinMax, collects all moves that
+ * share the highest score, and randomly selects one. This ensures
+ * optimal play while adding variety to the computer's openings.
+ * 
+ * Includes a 1-second delay (Sleep) to simulate "thinking" for
+ * a better user experience.
+ */
 void ComputerMove() {
     Sleep(1000);
 
     int bestVal = -1000;
-    int bestRow = -1;
-    int bestCol = -1;
     char opponentMarker = (currentMarker == 'X') ? 'O' : 'X';
-    char temp;
+    vector<pair<int,int>> bestMoves;
+
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             if (board[i][j] != 'X' && board[i][j] != 'O') {
-                temp = board[i][j];
+                char temp = board[i][j];
                 board[i][j] = currentMarker;
+                
                 int moveVal = MinMax(0, false, currentMarker, opponentMarker);
+                
                 board[i][j] = temp;
+
                 if (moveVal > bestVal) {
                     bestVal = moveVal;
-                    bestRow = i;
-                    bestCol = j;
+                    bestMoves.clear(); // Found a NEW best, throw away the old mediocre ones
+                    bestMoves.push_back({i, j});
+                } else if (moveVal == bestVal) {
+                    bestMoves.push_back({i, j}); // Another move that is equally good
                 }
             }
         }
     }
 
-    board[bestRow][bestCol] = currentMarker;
+    if (!bestMoves.empty()) {
+        int pick = rand() % bestMoves.size();
+        board[bestMoves[pick].first][bestMoves[pick].second] = currentMarker;
+    }
 }
 
+/**
+ * @brief Returns a color-coded string representation of a board marker.
+ * 
+ * 'X' is rendered in Red, 'O' in Blue. Number characters (empty slots)
+ * are returned without color formatting.
+ * 
+ * @param marker The character to colorize ('X', 'O', or '1'-'9').
+ * @return string The ANSI-colored string for terminal output.
+ */
 string GetColoredMarker(char marker) {
     if (marker == 'X') return RED + "X" + RESET;
     if (marker == 'O') return BLUE + "O" + RESET;
     return string(1, marker); 
 }
 
+/**
+ * @brief Checks if the current player has achieved three-in-a-row.
+ * 
+ * Scans all rows, columns, and both diagonals of the board.
+ * Used by the main game loop to determine if a round has been won.
+ * 
+ * @return true  If any row, column, or diagonal has three matching markers.
+ * @return false If no winning condition is met.
+ */
 bool CheckWin() {
-    
     for (int i = 0; i < 3; i++) {
         if (board[i][0] == board[i][1] && board[i][1] == board[i][2]) return true;
         if (board[0][i] == board[1][i] && board[1][i] == board[2][i]) return true;
@@ -355,6 +416,13 @@ bool CheckWin() {
     return false;
 }
 
+/**
+ * @brief Clears the screen and renders the game board with the UI header.
+ * 
+ * Displays the game title, current round number, series format,
+ * live score for both players (with colored markers), and the
+ * 3x3 board grid with ANSI-colored markers.
+ */
 void DrawBoard() {
     system("cls");
     
@@ -363,7 +431,6 @@ void DrawBoard() {
     cout << "      * TIC-TAC-TOE PRO   *" << endl;
     cout << "      ***********************" << RESET << endl;
 
-    // Round & score info
     if (roundNumber > 0) {
         cout << CYAN << "      Round " << roundNumber << " | Best of " << bestOf << RESET << endl;
         cout << "      You (" << GetColoredMarker(playerChoice) << "): " << playerScore

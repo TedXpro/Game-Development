@@ -7,13 +7,12 @@
 
 using namespace std;
 
-// ANSI Color Codes
 const string RESET  = "\033[0m";
-const string RED    = "\033[31m";      // Used for 'X'
-const string BLUE   = "\033[34m";      // Used for 'O'
-const string GREEN  = "\033[32m";      // Used for Wins
-const string YELLOW = "\033[33m";      // Used for Headers
-const string CYAN   = "\033[36m";      // Used for Prompts
+const string RED    = "\033[31m";
+const string BLUE   = "\033[34m";
+const string GREEN  = "\033[32m";
+const string YELLOW = "\033[33m";
+const string CYAN   = "\033[36m";
 
 vector<vector<char>> board = {
     {'1', '2', '3'},
@@ -28,22 +27,31 @@ void DrawBoard();
 bool CheckWin();
 string GetColoredMarker(char marker);
 
+/**
+ * @brief Entry point for the classic 2-player Tic-Tac-Toe game.
+ * 
+ * Manages the full game lifecycle: marker selection, turn-based
+ * gameplay between two human players, input validation, win
+ * detection, and tie handling. Uses slot numbers 1-9 mapped to
+ * a 3x3 grid via mathematical division/modulo.
+ * 
+ * @return int Exit code (0 on success).
+ */
 int main() {
-    // Initial Clear
-    system("cls"); // [cite: 107, 250, 333]
+    system("cls");
 
     cout << CYAN << "Player 1 choose your Marker (X, O): " << RESET;
     while (true) {
         if (cin >> currentMarker) {
             currentMarker = toupper(currentMarker);
             if (currentMarker == 'X' || currentMarker == 'O') {
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear any trailing characters like spaces or letters 
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 break;
             }
         } else {
-            cin.clear(); // Clear the error flag if input entirely fails
+            cin.clear();
         }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard the invalid input
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << RED << "Invalid Marker! Please choose X or O: " << RESET;
     }
 
@@ -58,8 +66,8 @@ int main() {
             cout << "It's player " << currentPlayer << "'s turn (" << GetColoredMarker(currentMarker) << "). Enter slot: ";
             
             if (!(cin >> slot)) {
-                cin.clear(); // Clear the error flag
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard the invalid input
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << RED << "Invalid Input! Please enter a number 1-9." << RESET << endl;
                 continue;
             }
@@ -69,7 +77,6 @@ int main() {
                 continue;
             }
 
-            // Mathematical mapping [cite: 136, 153]
             int row = (slot - 1) / 3;
             int col = (slot - 1) % 3;
             
@@ -90,7 +97,6 @@ int main() {
             return 0;
         }
 
-        // Switch players and markers [cite: 160, 198, 199]
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
         currentMarker = (currentMarker == 'X') ? 'O' : 'X';
     }
@@ -99,25 +105,46 @@ int main() {
     return 0;
 }
 
-// Helper to return colored string for the board
+/**
+ * @brief Returns a color-coded string representation of a board marker.
+ * 
+ * 'X' is rendered in Red, 'O' in Blue. Number characters (empty slots)
+ * are returned without color formatting.
+ * 
+ * @param marker The character to colorize ('X', 'O', or '1'-'9').
+ * @return string The ANSI-colored string for terminal output.
+ */
 string GetColoredMarker(char marker) {
     if (marker == 'X') return RED + "X" + RESET;
     if (marker == 'O') return BLUE + "O" + RESET;
-    return string(1, marker); // Returns the number as is
+    return string(1, marker);
 }
 
+/**
+ * @brief Checks if the current player has achieved three-in-a-row.
+ * 
+ * Scans all rows, columns, and both diagonals of the board.
+ * Used by the main game loop to determine if the game has been won.
+ * 
+ * @return true  If any row, column, or diagonal has three matching markers.
+ * @return false If no winning condition is met.
+ */
 bool CheckWin() {
-    // Check rows and columns [cite: 165, 166, 200, 201]
     for (int i = 0; i < 3; i++) {
         if (board[i][0] == board[i][1] && board[i][1] == board[i][2]) return true;
         if (board[0][i] == board[1][i] && board[1][i] == board[2][i]) return true;
     }
-    // Check diagonals [cite: 167, 202, 203]
     if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) return true;
     if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) return true;
     return false;
 }
 
+/**
+ * @brief Clears the screen and renders the game board with the UI header.
+ * 
+ * Displays the game title banner and the 3x3 board grid with
+ * ANSI-colored markers. Called after every move to refresh the display.
+ */
 void DrawBoard() {
     system("cls");
     
