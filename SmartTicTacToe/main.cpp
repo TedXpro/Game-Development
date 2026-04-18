@@ -4,6 +4,9 @@
 #include <cstdlib>
 #include <cctype>
 #include <limits>
+#include <ctime>
+#include <windows.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -23,11 +26,15 @@ vector<vector<char>> board = {
 char currentMarker; 
 int currentPlayer;
 
+bool CheckLine(int r1, int c1, int r2, int c2, int r3, int c3, char marker);
+bool FindBestMove(char markerToLookFor);
+void ComputerMove();
 void DrawBoard();
 bool CheckWin();
 string GetColoredMarker(char marker);
 
 int main() {
+    srand(time(0));
     
     system("cls"); 
 
@@ -51,35 +58,37 @@ int main() {
 
     for (int i = 0; i < 9; i++) {
         int slot;
-        bool validMove = false;
-        
-        do {
-            cout << "It's player " << currentPlayer << "'s turn (" << GetColoredMarker(currentMarker) << "). Enter slot: ";
+        if (currentPlayer == 1) {
+            bool validMove = false;
             
-            if (!(cin >> slot)) {
-                cin.clear(); 
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
-                cout << RED << "Invalid Input! Please enter a number 1-9." << RESET << endl;
-                continue;
-            }
+            do {
+                cout << "It's player " << currentPlayer << "'s turn (" << GetColoredMarker(currentMarker) << "). Enter slot: ";
+                
+                if (!(cin >> slot)) {
+                    cin.clear(); 
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+                    cout << RED << "Invalid Input! Please enter a number 1-9." << RESET << endl;
+                    continue;
+                }
 
-            if (slot < 1 || slot > 9) {
-                cout << RED << "Invalid Slot! Please choose 1-9." << RESET << endl;
-                continue;
-            }
-
-            
-            int row = (slot - 1) / 3;
-            int col = (slot - 1) % 3;
-            
-            if (board[row][col] != 'X' && board[row][col] != 'O'){
-                board[row][col] = currentMarker;
-                validMove = true;
-            } else {
-                cout << RED << "Slot Already Taken! Please choose another." << RESET << endl;
-            }
-        } while (!validMove);
-
+                if (slot < 1 || slot > 9) {
+                    cout << RED << "Invalid Slot! Please choose 1-9." << RESET << endl;
+                    continue;
+                }
+                
+                int row = (slot - 1) / 3;
+                int col = (slot - 1) % 3;
+                
+                if (board[row][col] != 'X' && board[row][col] != 'O'){
+                    board[row][col] = currentMarker;
+                    validMove = true;
+                } else {
+                    cout << RED << "Slot Already Taken! Please choose another." << RESET << endl;
+                }
+            } while (!validMove);
+        } else {
+            ComputerMove();
+        }
         DrawBoard();
 
         if (CheckWin()) {
@@ -98,6 +107,58 @@ int main() {
     return 0;
 }
 
+bool FindBestMove(char markerToLookFor) {
+    for (int i = 0; i < 3; i++) 
+        if (CheckLine(i, 0, i, 1, i, 2, markerToLookFor)) return true;
+
+    for (int i = 0; i < 3; i++) 
+        if (CheckLine(0, i, 1, i, 2, i, markerToLookFor)) return true;
+
+    if (CheckLine(0, 0, 1, 1, 2, 2, markerToLookFor)) return true;
+    if (CheckLine(0, 2, 1, 1, 2, 0, markerToLookFor)) return true;
+
+    return false;
+}
+
+bool CheckLine(int r1, int c1, int r2, int c2, int r3, int c3, char marker) {
+    int count = 0;
+    int emptyRow = -1, emptyColumn = -1;
+
+    int rows[] = {r1, r2, r3};
+    int cols[] = {c1, c2, c3};
+
+    for (int i = 0; i < 3; i++) {
+        char cell = board[rows[i]][cols[i]];
+        if (cell == marker) count++;
+        else if (cell != 'X' && cell != 'O') {
+            emptyRow = rows[i];
+            emptyColumn = cols[i];
+        }
+    }
+
+    if (count == 2 && emptyRow != -1) {
+        board[emptyRow][emptyColumn] = currentMarker;
+        return true;
+    }
+    return false;
+}
+
+void ComputerMove() {
+    Sleep(1000);
+
+    if (FindBestMove(currentMarker)) return;
+
+    char opponentMarker = (currentMarker == 'X') ? 'O' : 'X';
+    if (FindBestMove(opponentMarker)) return;
+    int slot;
+    int row, col;
+    do {
+        slot = (rand() % 9) + 1;
+        row = (slot - 1) / 3;
+        col = (slot - 1) % 3;
+    } while (board[row][col] == 'X' || board[row][col] == 'O');
+    board[row][col] = currentMarker;
+}
 
 string GetColoredMarker(char marker) {
     if (marker == 'X') return RED + "X" + RESET;
