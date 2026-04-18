@@ -13,7 +13,7 @@ This version uses `windows.h` for specialized functionality, so it is optimized 
 
 1. **Compile**:
    ```powershell
-   g++ main.cpp -o smart_tictactoe.exe
+   g++ -static-libgcc -static-libstdc++ main.cpp -o smart_tictactoe.exe
    ```
 2. **Run**:
    ```powershell

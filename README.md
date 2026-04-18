@@ -1,5 +1,7 @@
 # 🕹️ C++ Terminal Games Collection
 
+![C++ Game Studio Banner](file:///C:/Users/Tedy/.gemini/antigravity/brain/632db42e-ab23-42ba-b556-81f563d1c8d7/game_studio_banner_1776522576042.png)
+
 Welcome to my collection of classic terminal games built with C++. This project is a "Game Studio" style monorepo containing various board games and AI experiments.
 
 ## 🚀 Getting Started
@@ -34,7 +36,7 @@ Each game has a `main.cpp`. To compile any game manually:
 ```powershell
 # Example for Tic-Tac-Toe
 cd TicTacToe
-g++ main.cpp -o tictactoe.exe
+g++ -static-libgcc -static-libstdc++ main.cpp -o tictactoe.exe
 ./tictactoe.exe
 ```
 

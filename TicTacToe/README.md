@@ -12,7 +12,7 @@ Ensure you have `g++` installed.
 
 1. **Compile**:
    ```powershell
-   g++ main.cpp -o tictactoe.exe
+   g++ -static-libgcc -static-libstdc++ main.cpp -o tictactoe.exe
    ```
 2. **Run**:
    ```powershell
